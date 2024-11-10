@@ -46,7 +46,7 @@ public class GetraenkControl {
 					Float.parseFloat(this.getraenkView.getTxtVerkaufspreis().getText()),
 					this.getraenkView.getTxtMitAlkohol().getText(),
 					this.getraenkView.getTxtBehaeltnis().getText().split(";")));
-			this.getraenkView.zeigeInformationsfensterAn("Der Tee wurde aufgenommen!");
+			this.getraenkView.zeigeInformationsfensterAn("Der Getraenk wurde aufgenommen!");
 		} catch (Exception exc) {
 			getraenkView.zeigeFehlermeldungsfensterAn(exc.getMessage());
 		}

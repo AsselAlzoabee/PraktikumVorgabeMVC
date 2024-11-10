@@ -53,7 +53,7 @@ public class GetraenkView {
 
 		Scene scene = new Scene(this.pane, 700, 340);
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Verwaltung von Bürgerämtern");
+		primaryStage.setTitle("Verwaltung von Getraenk");
 		primaryStage.show();
 		this.initKomponenten();
 		this.initListener();
