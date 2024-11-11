@@ -162,7 +162,7 @@ public class GetraenkView {
 		if (this.getraenkModel.getGetraenk() != null) {
 			txtAnzeige.setText(this.getraenkModel.getGetraenk().gibGetraenkZurueck(' '));
 		} else {
-			zeigeInformationsfensterAn("Bisher wurde kein Bürgeramt aufgenommen!");
+			zeigeInformationsfensterAn("Bisher wurde kein Getraenk aufgenommen!");
 		}
 	}
 

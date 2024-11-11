@@ -72,6 +72,6 @@ public class Getraenk {
 
 	public String gibGetraenkZurueck(char trenner) {
 		return this.getartikelnummer() + trenner + this.geteinkaufspreis() + trenner + this.getverkaufspreis() + trenner
-				+ this.getmitAlkohol() + trenner + "\n" + this.getbehaelnisAlsString(trenner) + "\n";
+				+ this.getmitAlkohol() + trenner + this.getbehaelnisAlsString(trenner);
 	}
 }

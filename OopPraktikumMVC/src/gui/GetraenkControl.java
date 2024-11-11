@@ -18,19 +18,20 @@ public class GetraenkControl {
 
 	public void leseAusDatei(String typ) {
 		try {
+
 			this.getraenkModel.leseAusDatei(typ);
+			this.getraenkView.zeigeInformationsfensterAn("Der Getrank wurden gelesen!");
 		} catch (IOException exc) {
 			this.getraenkView.zeigeFehlermeldungsfensterAn("IOException beim Lesen!");
 		} catch (Exception exc) {
-			this.getraenkView.zeigeFehlermeldungsfensterAn("Unbekannter Fehler beim Lesen!" + exc.getMessage());
-			// exc.printStackTrace(); // Detaillierte Ausgabe des Fehlers in der Konsole
+			this.getraenkView.zeigeFehlermeldungsfensterAn("Unbekannter Fehler beim Lesen!");
 		}
 	}
 
 	public void schreibeGetraenkInCsvDatei() {
 		try {
 			this.getraenkModel.schreibeGetraenkInCsvDatei();
-			this.getraenkView.zeigeInformationsfensterAn("Die Tee wurden gespeichert!");
+			this.getraenkView.zeigeInformationsfensterAn("Die Getranke wurden gespeichert!");
 		} catch (IOException exc) {
 			this.getraenkView.zeigeFehlermeldungsfensterAn("IOException beim Speichern!");
 		} catch (Exception exc) {

@@ -1,10 +1,12 @@
 package business;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import csvImport.ConcreteReaderCreator;
+import csvImport.ReaderCreator;
+import csvImport.ReaderProduct;
 
 public class GetraenkModel {
 
@@ -12,20 +14,21 @@ public class GetraenkModel {
 
 	public void schreibeGetraenkInCsvDatei() throws IOException {
 
-		BufferedWriter aus = new BufferedWriter(new FileWriter("GetraenkAusgabe.csv", true));
+		BufferedWriter aus = new BufferedWriter(new FileWriter("GetraenkAusgabe.csv", false));
 		aus.write(getraenk.gibGetraenkZurueck(';'));
 		aus.close();
 	}
 
 	public void leseAusDatei(String typ) throws IOException {
-		if ("csv".equals(typ)) {
-			BufferedReader ein = new BufferedReader(new FileReader("GetraenkAusgabe.csv"));
-			String[] zeile = ein.readLine().split(";");
-			this.getraenk = new Getraenk(zeile[0], Float.parseFloat(zeile[1]), Float.parseFloat(zeile[2]), zeile[3],
-					zeile[4].split(";"));
 
-			ein.close();
-		}
+		ReaderCreator creator = new ConcreteReaderCreator();
+		ReaderProduct readerProduct = creator.factoryMethod(typ);
+
+		String[] zeile = readerProduct.leseAusDatei();
+		readerProduct.schliesseDatei();
+		this.getraenk = new Getraenk(zeile[0], Float.parseFloat(zeile[1]), Float.parseFloat(zeile[2]), zeile[3],
+				zeile[4].split("_"));
+
 	}
 
 	public static Getraenk getGetraenk() {
