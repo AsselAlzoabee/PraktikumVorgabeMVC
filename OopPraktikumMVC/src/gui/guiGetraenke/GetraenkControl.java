@@ -1,4 +1,4 @@
-package gui;
+package gui.guiGetraenke;
 
 import java.io.IOException;
 
@@ -12,7 +12,8 @@ public class GetraenkControl {
 	public static GetraenkModel getraenkModel;
 
 	public GetraenkControl(Stage primaryStage) {
-		this.getraenkModel = new GetraenkModel();
+		// erstellung oder aufruf der Objekt von der main methode
+		this.getraenkModel = GetraenkModel.getInstantz();
 		this.getraenkView = new GetraenkView(this, getraenkModel, primaryStage);
 	}
 

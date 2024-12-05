@@ -1,12 +1,6 @@
-package gui;
+package gui.guiGetraenke;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import business.Buergeramt;
+import business.GetraenkModel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -24,7 +18,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import ownUtil.MeldungsfensterAnzeiger;
 
-public class GetraenkeAnwendersystem {
+public class GetraenkView implements ownUtil.Observer {
+
+	public static GetraenkControl getraenkControl;
+	public static GetraenkModel getraenkModel;
 
 	// ---Anfang Attribute der grafischen Oberflaeche---
 	private Pane pane = new Pane();
@@ -50,16 +47,19 @@ public class GetraenkeAnwendersystem {
 	private MenuItem mnItmCsvExport = new MenuItem("csv-Export");
 	// -------Ende Attribute der grafischen Oberflaeche-------
 
-	// speichert temporaer ein Objekt vom Typ Buergeramt
-	private GetraenkeAnwendersystem getraenkeAnwendersystem;
+	public GetraenkView(GetraenkControl getraenkControl, GetraenkModel getraenkModel, Stage primaryStage) {
+		this.getraenkModel = getraenkModel;
+		this.getraenkControl = getraenkControl;
 
-	public GetraenkeAnwendersystem(Stage primaryStage) {
 		Scene scene = new Scene(this.pane, 700, 340);
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Verwaltung von Bürgerämtern");
+		primaryStage.setTitle("Verwaltung von Getraenk");
 		primaryStage.show();
 		this.initKomponenten();
 		this.initListener();
+
+		// observer erstellen zur nutzung
+		this.getraenkModel.addObserver(this);
 	}
 
 	private void initKomponenten() {
@@ -132,92 +132,107 @@ public class GetraenkeAnwendersystem {
 		btnEingabe.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				nehmeGetraenkAuf();
+				getraenkControl.nehmeGetraenkAuf();
+				getraenkModel.notifyObservers();
 			}
 		});
 		btnAnzeige.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				zeigeGetraenkAn();
+				update();
 			}
 		});
 		mnItmCsvImport.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				leseAusDatei("csv");
+				getraenkControl.leseAusDatei("csv");
 			}
 		});
 		mnItmTxtImport.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				leseAusDatei("txt");
+				getraenkControl.leseAusDatei("txt");
 			}
 		});
 		mnItmCsvExport.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				schreibeGetraenkInCsvDatei();
+				getraenkControl.schreibeGetraenkInCsvDatei();
 			}
 		});
 	}
 
-	private void nehmeGetraenkAuf() {
-		try {
-			this.buergeramt = new Buergeramt(txtArtikelnummer.getText(), Float.parseFloat(txtEinkaufspreis.getText()),
-					Float.parseFloat(txtVerkaufspreis.getText()), txtMitAlkohol.getText(),
-					txtBehaeltnis.getText().split(";"));
-			zeigeInformationsfensterAn("Das Bürgeramt wurde aufgenommen!");
-		} catch (Exception exc) {
-			zeigeFehlermeldungsfensterAn(exc.getMessage());
-		}
-	}
+//	private void zeigeGetraenkAn() {
+//		if (this.getraenkModel.getGetraenk() != null) {
+//			txtAnzeige.setText(this.getraenkModel.getGetraenk().gibGetraenkZurueck(' '));
+//		} else {
+//			zeigeInformationsfensterAn("Bisher wurde kein Getraenk aufgenommen!");
+//		}
+//	}
 
-	private void zeigeGetraenkAn() {
-		if (this.buergeramt != null) {
-			txtAnzeige.setText(this.buergeramt.gibBuergeramtZurueck(' '));
-		} else {
-			zeigeInformationsfensterAn("Bisher wurde kein Bürgeramt aufgenommen!");
-		}
-	}
-
-	private void leseAusDatei(String typ) {
-		try {
-			if ("csv".equals(typ)) {
-				BufferedReader ein = new BufferedReader(new FileReader("Buergeraemter.csv"));
-				String[] zeile = ein.readLine().split(";");
-				this.buergeramt = new Buergeramt(zeile[0], Float.parseFloat(zeile[1]), Float.parseFloat(zeile[2]),
-						zeile[3], zeile[4].split("_"));
-				ein.close();
-				zeigeInformationsfensterAn("Die Bürgerämter wurden gelesen!");
-			} else {
-				zeigeInformationsfensterAn("Noch nicht implementiert!");
-			}
-		} catch (IOException exc) {
-			zeigeFehlermeldungsfensterAn("IOException beim Lesen!");
-		} catch (Exception exc) {
-			zeigeFehlermeldungsfensterAn("Unbekannter Fehler beim Lesen!");
-		}
-	}
-
-	private void schreibeGetraenkInCsvDatei() {
-		try {
-			BufferedWriter aus = new BufferedWriter(new FileWriter("BuergeraemterAusgabe.csv", true));
-			aus.write(buergeramt.gibBuergeramtZurueck(';'));
-			aus.close();
-			zeigeInformationsfensterAn("Die Bürgerämter wurden gespeichert!");
-		} catch (IOException exc) {
-			zeigeFehlermeldungsfensterAn("IOException beim Speichern!");
-		} catch (Exception exc) {
-			zeigeFehlermeldungsfensterAn("Unbekannter Fehler beim Speichern!");
-		}
-	}
-
-	private void zeigeInformationsfensterAn(String meldung) {
+	void zeigeInformationsfensterAn(String meldung) {
 		new MeldungsfensterAnzeiger(AlertType.INFORMATION, "Information", meldung).zeigeMeldungsfensterAn();
 	}
 
 	void zeigeFehlermeldungsfensterAn(String meldung) {
 		new MeldungsfensterAnzeiger(AlertType.ERROR, "Fehler", meldung).zeigeMeldungsfensterAn();
+	}
+
+	public TextField getTxtArtikelnummer() {
+		return txtArtikelnummer;
+	}
+
+	public void setTxtArtikelnummer(TextField txtArtikelnummer) {
+		this.txtArtikelnummer = txtArtikelnummer;
+	}
+
+	public TextField getTxtEinkaufspreis() {
+		return txtEinkaufspreis;
+	}
+
+	public void setTxtEinkaufspreis(TextField txtEinkaufspreis) {
+		this.txtEinkaufspreis = txtEinkaufspreis;
+	}
+
+	public TextField getTxtVerkaufspreis() {
+		return txtVerkaufspreis;
+	}
+
+	public void setTxtVerkaufspreis(TextField txtVerkaufspreis) {
+		this.txtVerkaufspreis = txtVerkaufspreis;
+	}
+
+	public TextField getTxtMitAlkohol() {
+		return txtMitAlkohol;
+	}
+
+	public void setTxtMitAlkohol(TextField txtMitAlkohol) {
+		this.txtMitAlkohol = txtMitAlkohol;
+	}
+
+	public TextField getTxtBehaeltnis() {
+		return txtBehaeltnis;
+	}
+
+	public void setTxtBehaeltnis(TextField txtBehaeltnis) {
+		this.txtBehaeltnis = txtBehaeltnis;
+	}
+
+	public TextArea getTxtAnzeige() {
+		return txtAnzeige;
+	}
+
+	public void setTxtAnzeige(TextArea txtAnzeige) {
+		this.txtAnzeige = txtAnzeige;
+	}
+
+	@Override
+	public void update() {
+		if (this.getraenkModel.getGetraenk() != null) {
+			txtAnzeige.setText(this.getraenkModel.getGetraenk().gibGetraenkZurueck(' '));
+		} else {
+			zeigeInformationsfensterAn("Bisher wurde kein Getraenk aufgenommen!");
+		}
 	}
 
 }
